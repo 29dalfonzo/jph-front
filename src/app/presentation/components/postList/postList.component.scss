@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post-list-header {
+  display: flex;
+  gap: 1rem;
+}
+
+.search-input {
+  width: 250px;
+}
+
+.search-post-button {
+  width: 100px;
+}
