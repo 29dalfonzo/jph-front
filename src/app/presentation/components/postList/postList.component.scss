@@ -1,7 +1,3 @@
-:host {
-  display: block;
-}
-
 .container {
   display: flex;
   flex-direction: column;
@@ -19,4 +15,12 @@
 
 .search-post-button {
   width: 100px;
+}
+
+.post-list-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 4rem;
 }

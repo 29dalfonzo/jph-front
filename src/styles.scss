@@ -1,1 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.p-card {
+  padding: 1rem;
+}

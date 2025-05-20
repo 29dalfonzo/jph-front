@@ -6,7 +6,7 @@ import { SidebarModule } from 'primeng/sidebar';
   standalone: true,
   imports: [SidebarModule, RouterOutlet],
   template: `
-    <div class="container">
+    <div class="container-layout">
       <h1>Posts App</h1>
 
       <router-outlet />
