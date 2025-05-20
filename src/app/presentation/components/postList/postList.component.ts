@@ -10,6 +10,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { PostComment } from '../../../domain/models/comment.interface';
 import { PostStateService } from '../../../data/states/postState.service';
 import { CommentsComponent } from '../comments/comments.component';
+import { CreatePostModalComponent } from '../../shared/create-post-modal/create-post-modal.component';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -21,6 +22,7 @@ import { CommentsComponent } from '../comments/comments.component';
     PaginatorModule,
     DrawerModule,
     CommentsComponent,
+    CreatePostModalComponent,
   ],
   providers: [PostService],
   template: `
@@ -42,17 +44,18 @@ import { CommentsComponent } from '../comments/comments.component';
       </div>
 
       <!-- TODO: Add new post button -->
-      <!-- <button
+      <button
         pButton
         type="button"
         label="Nuevo"
         icon="pi pi-plus"
         class="new-post-button"
-      ></button> -->
+        (click)="onNewPost()"
+      ></button>
     </div>
 
     <ng-container *ngFor="let post of pagedPosts">
-      <app-post [post]="post" />
+      <app-post [post]="post" (delete)="deletePost(post.id)" />
     </ng-container>
     <p-paginator
       [rows]="rows"
@@ -71,6 +74,11 @@ import { CommentsComponent } from '../comments/comments.component';
         <app-comments [comment]="comment" />
       </ng-container>
     </p-drawer>
+
+    <app-create-post-modal
+      [visible]="openNewPostModal"
+      (onHide)="onNewPostClose($event)"
+    ></app-create-post-modal>
   `,
   styleUrl: './postList.component.scss',
 })
@@ -80,6 +88,7 @@ export class PostListComponent implements OnInit {
   comments: PostComment[] = [];
   currentPage = 0;
   rows = 5;
+  openNewPostModal = false;
 
   constructor(
     private readonly postService: PostService,
@@ -125,5 +134,34 @@ export class PostListComponent implements OnInit {
   onDrawerClose() {
     this.visible = false;
     this.postStateService.clear();
+  }
+
+  onNewPost() {
+    this.openNewPostModal = true;
+  }
+
+  onNewPostClose(event: any) {
+    console.log('onNewPostClose', event);
+    if (event) {
+      this.postService.createPost(event).subscribe(
+        (post) => {
+          //!se agrega de esta manera ya que el post no agrega dentro de la api, solo lo simula
+          this.posts.unshift(post);
+          //TODO: agregar un toast para indicar que el post se ha creado
+        },
+        (error) => {
+          //TODO: agregar un toast para indicar que el post no se ha creado
+        }
+      );
+    }
+
+    this.openNewPostModal = false;
+  }
+
+  deletePost(postId: number) {
+    this.postService.deletePost(postId).subscribe((post) => {
+      this.posts = this.posts.filter((post) => post.id !== postId);
+      //TODO: agregar un toast para indicar que el post se ha eliminado
+    });
   }
 }
