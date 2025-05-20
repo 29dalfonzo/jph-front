@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { Post } from '../domain/models/post.interface';
-import { PostComment } from '../domain/models/comment.interface';
+import { Post } from '../../domain/models/post.interface';
+import { PostComment } from '../../domain/models/comment.interface';
 
 @Injectable({
   providedIn: 'root',

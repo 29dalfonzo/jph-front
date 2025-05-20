@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Post } from '../../domain/models/post.interface';
+import { PostComment } from '../../domain/models/comment.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ export class PostService {
     return this.http.get<Post[]>(`${this.url}/posts`);
   }
 
-  getComments(postId: number): Observable<Comment[]> {
-    return this.http.get<Comment[]>(`${this.url}/posts/${postId}/comments`);
+  getComments(postId: number): Observable<PostComment[]> {
+    return this.http.get<PostComment[]>(`${this.url}/posts/${postId}/comments`);
   }
 }

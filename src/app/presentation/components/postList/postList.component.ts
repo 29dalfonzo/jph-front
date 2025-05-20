@@ -8,7 +8,7 @@ import { Post } from '../../../domain/models/post.interface';
 import { PaginatorModule } from 'primeng/paginator';
 import { DrawerModule } from 'primeng/drawer';
 import { PostComment } from '../../../domain/models/comment.interface';
-import { PostStateService } from '../../../data/postState.service';
+import { PostStateService } from '../../../data/states/postState.service';
 import { CommentsComponent } from '../comments/comments.component';
 @Component({
   selector: 'app-post-list',

@@ -9,7 +9,7 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Post } from '../../../domain/models/post.interface';
-import { PostStateService } from '../../../data/postState.service';
+import { PostStateService } from '../../../data/states/postState.service';
 @Component({
   selector: 'app-post',
   standalone: true,
