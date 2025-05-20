@@ -33,7 +33,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
             label="Ver más"
             icon="pi pi-eye"
             styleClass="w-full"
-            (click)="emitComments()"
+            (click)="emitView()"
+          />
+          <p-button
+            label="Editar"
+            icon="pi pi-pencil"
+            styleClass="w-full"
+            (click)="emitEdit()"
           />
 
           <p-button icon="pi pi-trash" (click)="confirmDelete($event)" />
@@ -48,16 +54,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 export class PostComponent {
   @Input() post: Post = {} as Post;
   @Output() delete = new EventEmitter<number>();
-
+  @Output() edit = new EventEmitter<Post>();
+  @Output() view = new EventEmitter<number>();
   constructor(
     private readonly postStateService: PostStateService,
-    private readonly confirmationService: ConfirmationService,
-    private readonly messageService: MessageService
+    private readonly confirmationService: ConfirmationService
   ) {}
-
-  emitComments() {
-    this.postStateService.setPost(this.post);
-  }
 
   confirmDelete(event: Event) {
     this.confirmationService.confirm({
@@ -83,5 +85,13 @@ export class PostComponent {
 
   deletePost() {
     this.delete.emit(this.post.id);
+  }
+
+  emitEdit() {
+    this.edit.emit(this.post);
+  }
+
+  emitView() {
+    this.view.emit(this.post.id);
   }
 }
