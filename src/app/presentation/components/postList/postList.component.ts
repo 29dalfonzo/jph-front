@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PostComponent } from '../post/post.component';
@@ -6,6 +6,10 @@ import { CommonModule } from '@angular/common';
 import { PostService } from '../../../data/services/post.service';
 import { Post } from '../../../domain/models/post.interface';
 import { PaginatorModule } from 'primeng/paginator';
+import { DrawerModule } from 'primeng/drawer';
+import { PostComment } from '../../../domain/models/comment.interface';
+import { PostStateService } from '../../../data/states/postState.service';
+import { CommentsComponent } from '../comments/comments.component';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -15,6 +19,8 @@ import { PaginatorModule } from 'primeng/paginator';
     PostComponent,
     CommonModule,
     PaginatorModule,
+    DrawerModule,
+    CommentsComponent,
   ],
   providers: [PostService],
   template: `
@@ -54,15 +60,39 @@ import { PaginatorModule } from 'primeng/paginator';
       (onPageChange)="onPageChange($event)"
       [rowsPerPageOptions]="[5, 10, 20]"
     ></p-paginator>
+    <p-drawer
+      [(visible)]="visible"
+      header="Comentarios"
+      position="right"
+      [style]="{ width: '50%' }"
+      (onHide)="onDrawerClose()"
+    >
+      <ng-container *ngFor="let comment of comments">
+        <app-comments [comment]="comment" />
+      </ng-container>
+    </p-drawer>
   `,
   styleUrl: './postList.component.scss',
 })
 export class PostListComponent implements OnInit {
+  visible = false;
   posts: Post[] = [];
+  comments: PostComment[] = [];
   currentPage = 0;
   rows = 5;
 
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly postStateService: PostStateService
+  ) {
+    effect(() => {
+      const post = this.postStateService.getPost();
+      if (post().id) {
+        this.visible = true;
+        this.getComments(post().id);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getPosts();
@@ -84,5 +114,16 @@ export class PostListComponent implements OnInit {
     this.rows = event.rows;
 
     window.scrollTo(0, 0);
+  }
+
+  getComments(postId: number) {
+    this.postService.getComments(postId).subscribe((comments: any) => {
+      this.comments = comments;
+    });
+  }
+
+  onDrawerClose() {
+    this.visible = false;
+    this.postStateService.clear();
   }
 }
