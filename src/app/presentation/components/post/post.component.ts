@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { Post } from '../../../domain/models/post.interface';
 @Component({
   selector: 'app-post',
   standalone: true,
@@ -10,9 +11,6 @@ import { CardModule } from 'primeng/card';
     <p-card class="post-card">
       <p-header>
         <ng-template #title> {{ post.title }} </ng-template>
-        <ng-template #subtitle *ngIf="post.subtitle">
-          {{ post.subtitle }}
-        </ng-template>
       </p-header>
       <p>
         {{ post.body }}
@@ -28,5 +26,5 @@ import { CardModule } from 'primeng/card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostComponent {
-  @Input() post: any;
+  @Input() post: Post = {} as Post;
 }
