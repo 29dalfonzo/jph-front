@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, effect, EventEmitter, Input, Output } from '@angular/core';
 import { Post } from '../../../domain/models/post.interface';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
@@ -33,7 +33,7 @@ import { PostStateService } from '../../../data/states/postState.service';
     <div class="card flex justify-center">
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <p-dialog
-          header="Nuevo Post"
+          [header]="isEdit ? 'Editar Post' : 'Nuevo Post'"
           [modal]="true"
           [(visible)]="visible"
           (onHide)="onHide.emit()"
@@ -96,6 +96,7 @@ import { PostStateService } from '../../../data/states/postState.service';
   styleUrl: './create-post-modal.component.scss',
 })
 export class CreatePostModalComponent {
+  isEdit = false;
   @Input() visible = false;
   @Output() onHide = new EventEmitter<Post>();
   form = this.formBuilder.group({
@@ -109,14 +110,28 @@ export class CreatePostModalComponent {
     private readonly postService: PostService,
     private readonly formBuilder: FormBuilder,
     private readonly postStateService: PostStateService
-  ) {}
+  ) {
+    this.form.reset();
+
+    effect(() => {
+      const post = this.postStateService.getPost();
+      if (post().id) {
+        this.isEdit = true;
+        this.visible = true;
+        this.form.patchValue(post());
+      } else {
+        this.isEdit = false;
+        this.form.reset();
+      }
+    });
+  }
 
   onSubmit() {
     this.newPost = {
       title: this.form.value.title ?? '',
       body: this.form.value.body ?? '',
       id: this.postStateService.getPost()().id,
-      userId: this.postStateService.getPost()().userId ?? 99,
+      userId: this.postStateService.getPost()().userId ?? 0,
     };
     this.onHide.emit(this.newPost);
   }

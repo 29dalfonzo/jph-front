@@ -55,7 +55,12 @@ import { CreatePostModalComponent } from '../../shared/create-post-modal/create-
     </div>
 
     <ng-container *ngFor="let post of pagedPosts">
-      <app-post [post]="post" (delete)="deletePost(post.id)" />
+      <app-post
+        [post]="post"
+        (delete)="deletePost(post.id)"
+        (edit)="editPost(post)"
+        (view)="viewPost(post.id)"
+      />
     </ng-container>
     <p-paginator
       [rows]="rows"
@@ -93,15 +98,7 @@ export class PostListComponent implements OnInit {
   constructor(
     private readonly postService: PostService,
     private readonly postStateService: PostStateService
-  ) {
-    effect(() => {
-      const post = this.postStateService.getPost();
-      if (post().id) {
-        this.visible = true;
-        this.getComments(post().id);
-      }
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.getPosts();
@@ -137,25 +134,33 @@ export class PostListComponent implements OnInit {
   }
 
   onNewPost() {
+    this.postStateService.clear();
     this.openNewPostModal = true;
   }
 
   onNewPostClose(event: any) {
-    console.log('onNewPostClose', event);
-    if (event) {
-      this.postService.createPost(event).subscribe(
-        (post) => {
-          //!se agrega de esta manera ya que el post no agrega dentro de la api, solo lo simula
-          this.posts.unshift(post);
-          //TODO: agregar un toast para indicar que el post se ha creado
-        },
-        (error) => {
-          //TODO: agregar un toast para indicar que el post no se ha creado
-        }
-      );
+    if (!event) {
+      return;
+    }
+    if (event?.id) {
+      this.updatePost(event);
+    } else {
+      this.createPost(event);
     }
 
     this.openNewPostModal = false;
+  }
+
+  createPost(post: Post) {
+    this.postService.createPost(post).subscribe((post) => {
+      this.posts.unshift(post);
+    });
+  }
+
+  updatePost(post: Post) {
+    this.postService.updatePost(post).subscribe((post) => {
+      this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
+    });
   }
 
   deletePost(postId: number) {
@@ -163,5 +168,17 @@ export class PostListComponent implements OnInit {
       this.posts = this.posts.filter((post) => post.id !== postId);
       //TODO: agregar un toast para indicar que el post se ha eliminado
     });
+  }
+
+  editPost(post: Post) {
+    if (post) {
+      this.postStateService.setPost(post);
+      this.openNewPostModal = true;
+    }
+  }
+
+  viewPost(postId: number) {
+    this.visible = true;
+    this.getComments(postId);
   }
 }
