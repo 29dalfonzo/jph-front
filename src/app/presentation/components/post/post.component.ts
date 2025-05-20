@@ -17,19 +17,23 @@ import { PostStateService } from '../../../data/states/postState.service';
   template: `
     <p-card class="post-card">
       <p-header>
-        <ng-template #title> {{ post.title }} </ng-template>
+        <ng-template #title>
+          {{ post.title }}
+        </ng-template>
       </p-header>
       <p>
         {{ post.body }}
       </p>
       <ng-template #footer>
-        <div class="flex gap-4 mt-1">
+        <div class="flex gap-4 mt-1 button-container">
           <p-button
             label="Ver más"
             icon="pi pi-eye"
             styleClass="w-full"
             (click)="emitComments()"
           />
+
+          <p-button icon="pi pi-trash" (click)="deletePost()" />
         </div>
       </ng-template>
     </p-card>
@@ -39,10 +43,15 @@ import { PostStateService } from '../../../data/states/postState.service';
 })
 export class PostComponent {
   @Input() post: Post = {} as Post;
+  @Output() delete = new EventEmitter<number>();
 
   constructor(private readonly postStateService: PostStateService) {}
 
   emitComments() {
     this.postStateService.setPost(this.post);
+  }
+
+  deletePost() {
+    this.delete.emit(this.post.id);
   }
 }

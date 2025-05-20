@@ -14,10 +14,18 @@ export class PostService {
   constructor(private readonly http: HttpClient) {}
 
   getPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.url}/posts`);
+    return this.http.get<Post[]>(`${this.url}posts`);
   }
 
   getComments(postId: number): Observable<PostComment[]> {
-    return this.http.get<PostComment[]>(`${this.url}/posts/${postId}/comments`);
+    return this.http.get<PostComment[]>(`${this.url}posts/${postId}/comments`);
+  }
+
+  createPost(post: Post): Observable<Post> {
+    return this.http.post<Post>(`${this.url}posts`, post);
+  }
+
+  deletePost(postId: number): Observable<Post> {
+    return this.http.delete<Post>(`${this.url}posts/${postId}`);
   }
 }
