@@ -1,8 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Post } from '../../../domain/models/post.interface';
+import { PostStateService } from '../../../data/postState.service';
 @Component({
   selector: 'app-post',
   standalone: true,
@@ -17,7 +24,12 @@ import { Post } from '../../../domain/models/post.interface';
       </p>
       <ng-template #footer>
         <div class="flex gap-4 mt-1">
-          <p-button label="Ver más" icon="pi pi-eye" styleClass="w-full" />
+          <p-button
+            label="Ver más"
+            icon="pi pi-eye"
+            styleClass="w-full"
+            (click)="emitComments()"
+          />
         </div>
       </ng-template>
     </p-card>
@@ -27,4 +39,10 @@ import { Post } from '../../../domain/models/post.interface';
 })
 export class PostComponent {
   @Input() post: Post = {} as Post;
+
+  constructor(private readonly postStateService: PostStateService) {}
+
+  emitComments() {
+    this.postStateService.setPost(this.post);
+  }
 }
