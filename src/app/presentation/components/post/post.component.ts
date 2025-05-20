@@ -63,7 +63,7 @@ export class PostComponent {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: '¿Estás seguro de querer eliminar este post?',
-      header: 'Danger Zone',
+      header: 'Eliminar Post',
       icon: 'pi pi-info-circle',
       rejectLabel: 'Cancelar',
       rejectButtonProps: {
