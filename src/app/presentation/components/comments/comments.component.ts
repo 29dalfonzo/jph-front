@@ -1,21 +1,16 @@
 import { Component, Input } from '@angular/core';
 import { PostComment } from '../../../domain/models/comment.interface';
-import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-comments',
   standalone: true,
-  imports: [CardModule],
+  imports: [],
   template: `
-    <p-card class="comment-card">
-      <p-header>
-        <ng-template #title> {{ comment.name }} </ng-template>
-        <ng-template #subtitle> {{ comment.email }} </ng-template>
-      </p-header>
-      <p>
-        {{ comment.body }}
-      </p>
-    </p-card>
+    <div class="comment-card">
+      <div class="comment-title">{{ comment.name }}</div>
+      <div class="comment-email">{{ comment.email }}</div>
+      <div class="comment-body">{{ comment.body }}</div>
+    </div>
   `,
   styleUrl: './comments.component.scss',
 })

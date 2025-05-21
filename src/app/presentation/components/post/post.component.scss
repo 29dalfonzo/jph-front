@@ -10,3 +10,60 @@
   display: flex;
   justify-content: space-between;
 }
+
+.app-post-card {
+  background: #23272a;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 188, 212, 0.08);
+  margin-bottom: 2rem;
+  padding: 2rem;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 4px 24px rgba(0, 188, 212, 0.18);
+  }
+}
+
+.app-post-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00bcd4;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.app-post-body {
+  color: #f5f6fa;
+  margin-bottom: 1.5rem;
+}
+
+.app-post-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.p-button {
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  padding: 0.6rem 1.5rem !important;
+  font-weight: 500 !important;
+  background: #23272a !important;
+  color: #00bcd4 !important;
+  border: 1.5px solid #00bcd4 !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  &:hover {
+    background: #00bcd4 !important;
+    color: #23272a !important;
+    border: 1.5px solid #0097a7 !important;
+    box-shadow: 0 4px 16px rgba(0, 188, 212, 0.18);
+  }
+}
+
+.p-button .pi {
+  font-size: 1.1rem;
+}

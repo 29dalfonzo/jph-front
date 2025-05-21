@@ -13,6 +13,8 @@ import { CommentsComponent } from '../comments/comments.component';
 import { CreatePostModalComponent } from '../../shared/create-post-modal/create-post-modal.component';
 import { ToastService } from '../../../data/services/toast.service';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -29,7 +31,7 @@ import { FormsModule } from '@angular/forms';
   ],
   providers: [PostService, ToastService],
   template: `
-    <div class="container post-list-container">
+    <div class="search-card">
       <div class="post-list-header">
         <input
           pInputText
@@ -37,23 +39,13 @@ import { FormsModule } from '@angular/forms';
           placeholder="Buscar..."
           class="search-input"
           [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearchChange()"
+          (ngModelChange)="onSearchInputChange($event)"
         />
-        <button
-          pButton
-          type="button"
-          label="Buscar"
-          icon="pi pi-search"
-          class="search-post-button"
-        ></button>
       </div>
-
-      <!-- TODO: Add new post button -->
       <button
         pButton
         type="button"
-        label="Nuevo"
-        icon="pi pi-plus"
+        label="+ Nuevo"
         class="new-post-button"
         (click)="onNewPost()"
       ></button>
@@ -62,9 +54,9 @@ import { FormsModule } from '@angular/forms';
     <ng-container *ngFor="let post of pagedPosts">
       <app-post
         [post]="post"
-        (delete)="deletePost(post.id)"
-        (edit)="editPost(post)"
-        (view)="viewPost(post.id)"
+        (delete)="deletePost($event)"
+        (edit)="editPost($event)"
+        (view)="viewPost($event)"
       />
     </ng-container>
     <p-paginator
@@ -102,6 +94,8 @@ export class PostListComponent implements OnInit {
   openNewPostModal = false;
   searchQuery = '';
   searchResults: Post[] = [];
+  private searchSubject = new Subject<string>();
+
   constructor(
     private readonly postService: PostService,
     private readonly postStateService: PostStateService,
@@ -110,9 +104,17 @@ export class PostListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getPosts();
+    this.searchSubject.pipe(debounceTime(500)).subscribe((query) => {
+      this.onSearchChange(query);
+    });
   }
 
-  onSearchChange() {
+  onSearchInputChange(value: string) {
+    this.searchSubject.next(value);
+  }
+
+  onSearchChange(query: string) {
+    this.searchQuery = query;
     if (this.searchQuery.length > 0) {
       this.searchResults = this.posts.filter((post) =>
         post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
@@ -121,6 +123,7 @@ export class PostListComponent implements OnInit {
       this.searchResults = this.posts;
     }
   }
+
   getPosts() {
     this.postService.getPosts().subscribe((posts) => {
       this.posts = posts;
@@ -173,6 +176,7 @@ export class PostListComponent implements OnInit {
     this.postService.createPost(post).subscribe(
       (post) => {
         this.posts.unshift(post);
+        this.searchResults = [...this.posts];
         this.toast.Success('Post creado correctamente');
       },
       (error) => {
@@ -185,6 +189,7 @@ export class PostListComponent implements OnInit {
     this.postService.updatePost(post).subscribe(
       (post) => {
         this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
+        this.searchResults = [...this.posts];
         this.toast.Success('Post actualizado correctamente');
       },
       (error) => {
@@ -197,6 +202,7 @@ export class PostListComponent implements OnInit {
     this.postService.deletePost(postId).subscribe(
       (post) => {
         this.posts = this.posts.filter((post) => post.id !== postId);
+        this.searchResults = [...this.posts];
         this.toast.Success('Post eliminado correctamente');
       },
       (error) => {
