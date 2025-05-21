@@ -11,6 +11,8 @@ import { PostComment } from '../../../domain/models/comment.interface';
 import { PostStateService } from '../../../data/states/postState.service';
 import { CommentsComponent } from '../comments/comments.component';
 import { CreatePostModalComponent } from '../../shared/create-post-modal/create-post-modal.component';
+import { ToastService } from '../../../data/services/toast.service';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -23,8 +25,9 @@ import { CreatePostModalComponent } from '../../shared/create-post-modal/create-
     DrawerModule,
     CommentsComponent,
     CreatePostModalComponent,
+    FormsModule,
   ],
-  providers: [PostService],
+  providers: [PostService, ToastService],
   template: `
     <div class="container post-list-container">
       <div class="post-list-header">
@@ -33,6 +36,8 @@ import { CreatePostModalComponent } from '../../shared/create-post-modal/create-
           type="text"
           placeholder="Buscar..."
           class="search-input"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
         />
         <button
           pButton
@@ -63,8 +68,9 @@ import { CreatePostModalComponent } from '../../shared/create-post-modal/create-
       />
     </ng-container>
     <p-paginator
+      *ngIf="this.searchResults.length > 0"
       [rows]="rows"
-      [totalRecords]="posts.length"
+      [totalRecords]="searchResults.length"
       (onPageChange)="onPageChange($event)"
       [rowsPerPageOptions]="[5, 10, 20]"
     ></p-paginator>
@@ -94,25 +100,37 @@ export class PostListComponent implements OnInit {
   currentPage = 0;
   rows = 5;
   openNewPostModal = false;
-
+  searchQuery = '';
+  searchResults: Post[] = [];
   constructor(
     private readonly postService: PostService,
-    private readonly postStateService: PostStateService
+    private readonly postStateService: PostStateService,
+    private readonly toast: ToastService
   ) {}
 
   ngOnInit(): void {
     this.getPosts();
   }
 
+  onSearchChange() {
+    if (this.searchQuery.length > 0) {
+      this.searchResults = this.posts.filter((post) =>
+        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    } else {
+      this.searchResults = this.posts;
+    }
+  }
   getPosts() {
     this.postService.getPosts().subscribe((posts) => {
       this.posts = posts;
+      this.searchResults = posts;
     });
   }
 
   get pagedPosts() {
     const start = this.currentPage * this.rows;
-    return this.posts.slice(start, start + this.rows);
+    return this.searchResults.slice(start, start + this.rows);
   }
 
   onPageChange(event: any) {
@@ -152,22 +170,39 @@ export class PostListComponent implements OnInit {
   }
 
   createPost(post: Post) {
-    this.postService.createPost(post).subscribe((post) => {
-      this.posts.unshift(post);
-    });
+    this.postService.createPost(post).subscribe(
+      (post) => {
+        this.posts.unshift(post);
+        this.toast.Success('Post creado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al crear el post');
+      }
+    );
   }
 
   updatePost(post: Post) {
-    this.postService.updatePost(post).subscribe((post) => {
-      this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
-    });
+    this.postService.updatePost(post).subscribe(
+      (post) => {
+        this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
+        this.toast.Success('Post actualizado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al actualizar el post');
+      }
+    );
   }
 
   deletePost(postId: number) {
-    this.postService.deletePost(postId).subscribe((post) => {
-      this.posts = this.posts.filter((post) => post.id !== postId);
-      //TODO: agregar un toast para indicar que el post se ha eliminado
-    });
+    this.postService.deletePost(postId).subscribe(
+      (post) => {
+        this.posts = this.posts.filter((post) => post.id !== postId);
+        this.toast.Success('Post eliminado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al eliminar el post');
+      }
+    );
   }
 
   editPost(post: Post) {
