@@ -18,34 +18,21 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   imports: [CardModule, ButtonModule, CommonModule, ConfirmDialogModule],
   providers: [ConfirmationService, MessageService],
   template: `
-    <p-card class="post-card">
-      <p-header>
-        <ng-template #title>
-          {{ post.title }}
-        </ng-template>
-      </p-header>
-      <p>
-        {{ post.body }}
-      </p>
-      <ng-template #footer>
-        <div class="flex gap-4 mt-1 button-container">
-          <p-button
-            label="Ver más"
-            icon="pi pi-eye"
-            styleClass="w-full"
-            (click)="emitView()"
-          />
-          <p-button
-            label="Editar"
-            icon="pi pi-pencil"
-            styleClass="w-full"
-            (click)="emitEdit()"
-          />
-
-          <p-button icon="pi pi-trash" (click)="confirmDelete($event)" />
-        </div>
-      </ng-template>
-    </p-card>
+    <div class="app-post-card">
+      <div class="app-post-title">{{ post.title }}</div>
+      <div class="app-post-body">{{ post.body }}</div>
+      <div class="app-post-actions">
+        <button pButton class="p-button" (click)="emitView()">
+          <i class="pi pi-eye"></i> Ver más
+        </button>
+        <button pButton class="p-button" (click)="emitEdit()">
+          <i class="pi pi-pencil"></i> Editar
+        </button>
+        <button pButton class="p-button" (click)="confirmDelete($event)">
+          <i class="pi pi-trash"></i>
+        </button>
+      </div>
+    </div>
     <p-confirmdialog />
   `,
   styleUrl: './post.component.scss',
@@ -62,6 +49,7 @@ export class PostComponent {
   ) {}
 
   confirmDelete(event: Event) {
+    console.log('confirmDelete', this.post);
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: '¿Estás seguro de querer eliminar este post?',

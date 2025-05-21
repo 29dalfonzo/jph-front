@@ -1,3 +1,32 @@
 :host {
   display: block;
 }
+
+.comment-card {
+  background: #23272a;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 188, 212, 0.08);
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  color: #f5f6fa;
+  border: 1.5px solid #00bcd422;
+}
+
+.comment-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #00bcd4;
+  margin-bottom: 0.2rem;
+}
+
+.comment-email {
+  font-size: 1rem;
+  color: #80deea;
+  margin-bottom: 0.5rem;
+}
+
+.comment-body {
+  color: #f5f6fa;
+  font-size: 1.05rem;
+  margin: 0;
+}
