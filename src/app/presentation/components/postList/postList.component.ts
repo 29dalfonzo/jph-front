@@ -12,6 +12,7 @@ import { PostStateService } from '../../../data/states/postState.service';
 import { CommentsComponent } from '../comments/comments.component';
 import { CreatePostModalComponent } from '../../shared/create-post-modal/create-post-modal.component';
 import { ToastService } from '../../../data/services/toast.service';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -24,6 +25,7 @@ import { ToastService } from '../../../data/services/toast.service';
     DrawerModule,
     CommentsComponent,
     CreatePostModalComponent,
+    FormsModule,
   ],
   providers: [PostService, ToastService],
   template: `
@@ -34,6 +36,8 @@ import { ToastService } from '../../../data/services/toast.service';
           type="text"
           placeholder="Buscar..."
           class="search-input"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
         />
         <button
           pButton
@@ -64,8 +68,9 @@ import { ToastService } from '../../../data/services/toast.service';
       />
     </ng-container>
     <p-paginator
+      *ngIf="this.searchResults.length > 0"
       [rows]="rows"
-      [totalRecords]="posts.length"
+      [totalRecords]="searchResults.length"
       (onPageChange)="onPageChange($event)"
       [rowsPerPageOptions]="[5, 10, 20]"
     ></p-paginator>
@@ -95,7 +100,8 @@ export class PostListComponent implements OnInit {
   currentPage = 0;
   rows = 5;
   openNewPostModal = false;
-
+  searchQuery = '';
+  searchResults: Post[] = [];
   constructor(
     private readonly postService: PostService,
     private readonly postStateService: PostStateService,
@@ -106,15 +112,25 @@ export class PostListComponent implements OnInit {
     this.getPosts();
   }
 
+  onSearchChange() {
+    if (this.searchQuery.length > 0) {
+      this.searchResults = this.posts.filter((post) =>
+        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    } else {
+      this.searchResults = this.posts;
+    }
+  }
   getPosts() {
     this.postService.getPosts().subscribe((posts) => {
       this.posts = posts;
+      this.searchResults = posts;
     });
   }
 
   get pagedPosts() {
     const start = this.currentPage * this.rows;
-    return this.posts.slice(start, start + this.rows);
+    return this.searchResults.slice(start, start + this.rows);
   }
 
   onPageChange(event: any) {
