@@ -11,6 +11,7 @@ import { PostComment } from '../../../domain/models/comment.interface';
 import { PostStateService } from '../../../data/states/postState.service';
 import { CommentsComponent } from '../comments/comments.component';
 import { CreatePostModalComponent } from '../../shared/create-post-modal/create-post-modal.component';
+import { ToastService } from '../../../data/services/toast.service';
 @Component({
   selector: 'app-post-list',
   standalone: true,
@@ -24,7 +25,7 @@ import { CreatePostModalComponent } from '../../shared/create-post-modal/create-
     CommentsComponent,
     CreatePostModalComponent,
   ],
-  providers: [PostService],
+  providers: [PostService, ToastService],
   template: `
     <div class="container post-list-container">
       <div class="post-list-header">
@@ -97,7 +98,8 @@ export class PostListComponent implements OnInit {
 
   constructor(
     private readonly postService: PostService,
-    private readonly postStateService: PostStateService
+    private readonly postStateService: PostStateService,
+    private readonly toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -152,22 +154,39 @@ export class PostListComponent implements OnInit {
   }
 
   createPost(post: Post) {
-    this.postService.createPost(post).subscribe((post) => {
-      this.posts.unshift(post);
-    });
+    this.postService.createPost(post).subscribe(
+      (post) => {
+        this.posts.unshift(post);
+        this.toast.Success('Post creado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al crear el post');
+      }
+    );
   }
 
   updatePost(post: Post) {
-    this.postService.updatePost(post).subscribe((post) => {
-      this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
-    });
+    this.postService.updatePost(post).subscribe(
+      (post) => {
+        this.posts = this.posts.map((p) => (p.id === post.id ? post : p));
+        this.toast.Success('Post actualizado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al actualizar el post');
+      }
+    );
   }
 
   deletePost(postId: number) {
-    this.postService.deletePost(postId).subscribe((post) => {
-      this.posts = this.posts.filter((post) => post.id !== postId);
-      //TODO: agregar un toast para indicar que el post se ha eliminado
-    });
+    this.postService.deletePost(postId).subscribe(
+      (post) => {
+        this.posts = this.posts.filter((post) => post.id !== postId);
+        this.toast.Success('Post eliminado correctamente');
+      },
+      (error) => {
+        this.toast.Error('Error al eliminar el post');
+      }
+    );
   }
 
   editPost(post: Post) {
